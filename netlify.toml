@@ -1,0 +1,7 @@
+[build]
+    command = "gatsby build"
+    publish = "public"
+    functions = "lambda"
+[dev]
+    framework = "gatsby"
+    command = "gatsby develop"

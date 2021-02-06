@@ -2,7 +2,7 @@ import './App.css';
 import React from 'react';
 import { useStripe } from '../../integrations/Stripe/stripeContext';
 import { ChangeEvent, useState } from 'react';
-import { StripeProduct } from '../../types/Stripe';
+import { StripeProduct } from '../../types/stripe';
 import Stripe from 'stripe';
 
 type CartItem = {

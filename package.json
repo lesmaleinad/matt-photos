@@ -22,10 +22,9 @@
         "web-vitals": "^0.2.4"
     },
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject"
+        "dev": "gatsby develop",
+        "build": "gatsby build",
+        "clean": "gatsby clean"
     },
     "eslintConfig": {
         "extends": [
@@ -47,6 +46,7 @@
     },
     "devDependencies": {
         "eslint-config-prettier": "^7.2.0",
-        "prettier": "^2.2.1"
+        "prettier": "^2.2.1",
+        "stripe-cli": "^0.1.0"
     }
 }
