@@ -4,6 +4,7 @@ import { useStripe } from '../../integrations/Stripe/stripeContext';
 import { ChangeEvent, useState } from 'react';
 import { StripeProduct } from '../../types/stripe';
 import Stripe from 'stripe';
+import { Tab, Tabs } from '@material-ui/core';
 
 type CartItem = {
     price: Stripe.Price;
@@ -27,7 +28,7 @@ function App({ pageContext: { stripeProducts } }: Props) {
     const stripePromise = useStripe();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-    async function handleClick() {
+    async function startCheckout() {
         console.log(cartItems);
         const stripe = await stripePromise;
 
@@ -97,10 +98,11 @@ function App({ pageContext: { stripeProducts } }: Props) {
                                     <p>sku: {price.nickname}</p>
                                     <p>
                                         price: $
-                                        {price.unit_amount_decimal?.slice(
-                                            0,
-                                            -2
-                                        )}
+                                        {price.unit_amount
+                                            ? (
+                                                  price.unit_amount / 100
+                                              ).toLocaleString()
+                                            : '???'}
                                     </p>
                                     <input
                                         type="number"
@@ -118,7 +120,7 @@ function App({ pageContext: { stripeProducts } }: Props) {
                     </div>
                 </div>
             ))}
-            <button onClick={handleClick}>Checkout</button>
+            <button onClick={startCheckout}>Checkout</button>
         </div>
     );
 }
