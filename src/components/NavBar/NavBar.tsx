@@ -8,17 +8,18 @@ export interface NavBarTab {
 }
 
 interface Props {
+    location: string;
     tabs: NavBarTab[];
 }
 
-export default function NavBar({ tabs }: Props) {
-    function findTabIndex(location: string): number {
+export default function NavBar({ location, tabs }: Props) {
+    function getTabIndex(): number {
         return tabs.findIndex((tab) => tab.to === location);
     }
 
     return (
         <Tabs
-            value={findTabIndex(window.location.pathname)}
+            value={getTabIndex()}
             TabIndicatorProps={{ style: { background: 'black' } }}
         >
             {tabs.map((tab) => (
