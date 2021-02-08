@@ -16,11 +16,11 @@ export default function Layout({ location, children }: Props) {
             label: 'Home',
         },
         {
-            to: '/about',
+            to: '/about/',
             label: 'About',
         },
         {
-            to: '/contact',
+            to: '/contact/',
             label: 'Contact',
         },
     ];

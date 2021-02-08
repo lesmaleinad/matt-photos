@@ -22,8 +22,8 @@ export default function NavBar({ location, tabs }: Props) {
             value={getTabIndex()}
             TabIndicatorProps={{ style: { background: 'black' } }}
         >
-            {tabs.map((tab) => (
-                <NavigationTab tab={tab} />
+            {tabs.map((tab, index) => (
+                <NavigationTab key={index} tab={tab} />
             ))}
         </Tabs>
     );
