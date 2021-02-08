@@ -1,22 +1,17 @@
 import './App.css';
 import React from 'react';
 import { useStripe } from '../../integrations/Stripe/stripeContext';
-import { ChangeEvent, useState } from 'react';
 import { StripeProduct } from '../../types/stripe';
 import Stripe from 'stripe';
-import { Tab, Tabs } from '@material-ui/core';
+import {
+    Storage,
+    StorageKey,
+} from '../../integrations/localStorage/storage.service';
 
 type CartItem = {
-    price: Stripe.Price;
-    quantity: number;
+    ['price']: Stripe.Price;
+    ['quantity']: number;
 };
-
-function toLineItems(items: CartItem[]) {
-    return items.map((item) => ({
-        price: item.price.id.toString(),
-        quantity: item.quantity,
-    }));
-}
 
 type Props = {
     pageContext: {
@@ -25,11 +20,23 @@ type Props = {
 };
 
 function App({ pageContext: { stripeProducts } }: Props) {
+    function getInitialCartItems(): CartItem[] {
+        return (Storage.get(StorageKey.CartItems)?.parse() ?? []) as CartItem[];
+    }
+
     const stripePromise = useStripe();
-    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [cartItems, setCartItems] = React.useState<CartItem[]>(
+        getInitialCartItems
+    );
 
     async function startCheckout() {
-        console.log(cartItems);
+        function toLineItems(items: CartItem[]) {
+            return items.map((item) => ({
+                price: item['price']['id'],
+                quantity: item['quantity'],
+            }));
+        }
+
         const stripe = await stripePromise;
 
         if (stripe) {
@@ -50,19 +57,21 @@ function App({ pageContext: { stripeProducts } }: Props) {
     }
 
     function getCartItemByPrice(price: Stripe.Price): CartItem | undefined {
-        return cartItems.find((cartItem) => cartItem.price === price);
+        return cartItems.find(
+            (cartItem) => cartItem['price']['id'] === price['id']
+        );
     }
 
     function onQuantityChange(newQuantity: number, price: Stripe.Price) {
         const newCartItems = cartItems.slice();
         const prevCartItemIndex = cartItems.findIndex(
-            (cartItem) => cartItem.price === price
+            (cartItem) => cartItem['price']['id'] === price['id']
         );
 
         if (newQuantity > 0) {
             const newCartItem: CartItem = {
-                price,
-                quantity: newQuantity,
+                ['price']: price,
+                ['quantity']: newQuantity,
             };
             if (prevCartItemIndex > -1) {
                 newCartItems[prevCartItemIndex] = newCartItem;
@@ -73,6 +82,7 @@ function App({ pageContext: { stripeProducts } }: Props) {
             newCartItems.splice(prevCartItemIndex, 1);
         }
 
+        Storage.set(StorageKey.CartItems, JSON.stringify(newCartItems));
         setCartItems(newCartItems);
     }
 
@@ -106,7 +116,9 @@ function App({ pageContext: { stripeProducts } }: Props) {
                                     </p>
                                     <input
                                         type="number"
-                                        value={cartItem?.quantity || 0}
+                                        value={
+                                            cartItem ? cartItem['quantity'] : 0
+                                        }
                                         onChange={(event) =>
                                             onQuantityChange(
                                                 parseInt(event.target.value),

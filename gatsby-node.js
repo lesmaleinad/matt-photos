@@ -1,6 +1,7 @@
 const stripe = require('stripe')(
     'sk_test_51IDCTNA5W2SKE4KYT2h2vdNZoLHdfbsOKB4ZT2bFDImIPnQcQwGXyQBl5HlwbMDW421Zu0UwW6WHKTNbhnWYhxR000l6kreNAt'
 );
+const path = require('path');
 
 exports.createPages = async ({ actions: { createPage } }) => {
     async function getProductWithPrices(product) {
@@ -22,7 +23,7 @@ exports.createPages = async ({ actions: { createPage } }) => {
 
     createPage({
         path: '/',
-        component: require('path').resolve('src/components/App/App.tsx'),
+        component: path.resolve('src/components/App/App.tsx'),
         context: { stripeProducts },
     });
 };
