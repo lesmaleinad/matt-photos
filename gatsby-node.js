@@ -1,6 +1,4 @@
-const stripe = require('stripe')(
-    'sk_test_51IDCTNA5W2SKE4KYT2h2vdNZoLHdfbsOKB4ZT2bFDImIPnQcQwGXyQBl5HlwbMDW421Zu0UwW6WHKTNbhnWYhxR000l6kreNAt'
-);
+const stripe = require('stripe')(process.env.STRIPE_API_SECRET);
 const path = require('path');
 
 exports.createPages = async ({ actions: { createPage } }) => {
