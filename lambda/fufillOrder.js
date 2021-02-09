@@ -1,6 +1,4 @@
-const stripe = require('stripe')(
-    'pk_test_51IDCTNA5W2SKE4KYHiJrnhLlddu0LUx6l44c5iVJBy0Wulhw96RWBJs2XJwWkQzwIR6aFwh0VFStH4QsmXfbyJew00aZZHCTE2'
-);
+const stripe = require('stripe')(process.env.STRIPE_API_SECRET);
 
 exports.handler = async function (event, context) {
     const lineItemsData = await stripe.checkout.sessions.listLineItems(
