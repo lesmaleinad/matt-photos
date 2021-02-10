@@ -1,11 +1,16 @@
 import { graphql, Node } from 'gatsby';
+import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import Stripe from 'stripe';
 import App from '../components/App/App';
 import { StripeProduct } from '../types/stripe';
 
-interface StripeProductNode extends Stripe.Product {
-    localFiles: Node;
+export interface StripeProductNode extends Stripe.Product {
+    localFiles: {
+        childImageSharp: {
+            fixed: FixedObject;
+        };
+    }[];
 }
 
 interface StripePriceNode extends Stripe.Price {
@@ -54,6 +59,17 @@ export const query = graphql`
                 name
                 description
                 images
+                localFiles {
+                    childImageSharp {
+                        fixed(width: 300) {
+                            base64
+                            width
+                            height
+                            src
+                            srcSet
+                        }
+                    }
+                }
                 metadata {
                     key
                 }

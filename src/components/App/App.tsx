@@ -1,12 +1,13 @@
 import './App.css';
 import React from 'react';
 import { useStripe } from '../../integrations/Stripe/stripeContext';
-import { StripeProduct } from '../../types/stripe';
 import Stripe from 'stripe';
 import {
     Storage,
     StorageKey,
 } from '../../integrations/localStorage/storage.service';
+import Img from 'gatsby-image';
+import { StripeProduct } from '../../types/stripe';
 
 type CartItem = {
     ['price']: Stripe.Price;
@@ -92,13 +93,7 @@ function App({ pageContext: { stripeProducts } }: Props) {
                 <div key={product.id}>
                     <p>id: {product.id}</p>
                     name: {product.name}
-                    <img
-                        style={{
-                            width: 300,
-                            height: 200,
-                        }}
-                        src={product.images[0]}
-                    ></img>
+                    <Img fixed={product.localFiles[0].childImageSharp.fixed} />
                     <div>
                         {product.prices.map((price) => {
                             const cartItem = getCartItemByPrice(price);
