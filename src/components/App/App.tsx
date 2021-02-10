@@ -93,7 +93,10 @@ function App({ pageContext: { stripeProducts } }: Props) {
                 <div key={product.id}>
                     <p>id: {product.id}</p>
                     name: {product.name}
-                    <Img fixed={product.localFiles[0].childImageSharp.fixed} />
+                    <Img
+                        style={{ width: 600, height: 400 }}
+                        fixed={product.localFiles[0].childImageSharp.fixed}
+                    />
                     <div>
                         {product.prices.map((price) => {
                             const cartItem = getCartItemByPrice(price);
