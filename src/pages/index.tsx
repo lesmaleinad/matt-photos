@@ -1,5 +1,5 @@
 import { graphql, Node } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
+import { FluidObject } from 'gatsby-image';
 import React from 'react';
 import Stripe from 'stripe';
 import App from '../components/App/App';
@@ -8,7 +8,7 @@ import { StripeProduct } from '../types/stripe';
 export interface StripeProductNode extends Stripe.Product {
     localFiles: {
         childImageSharp: {
-            fixed: FixedObject;
+            fluid: FluidObject;
         };
     }[];
 }
@@ -61,12 +61,8 @@ export const query = graphql`
                 images
                 localFiles {
                     childImageSharp {
-                        fixed(width: 1000) {
-                            base64
-                            width
-                            height
-                            src
-                            srcSet
+                        fluid(maxWidth: 1000) {
+                            ...GatsbyImageSharpFluid
                         }
                     }
                 }

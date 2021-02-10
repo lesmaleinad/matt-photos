@@ -95,7 +95,7 @@ function App({ pageContext: { stripeProducts } }: Props) {
                     name: {product.name}
                     <Img
                         style={{ width: 600, height: 400 }}
-                        fixed={product.localFiles[0].childImageSharp.fixed}
+                        fluid={product.localFiles[0].childImageSharp.fluid}
                     />
                     <div>
                         {product.prices.map((price) => {
