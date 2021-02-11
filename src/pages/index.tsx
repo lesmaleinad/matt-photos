@@ -1,4 +1,4 @@
-import { graphql, Node } from 'gatsby';
+import { graphql } from 'gatsby';
 import { FluidObject } from 'gatsby-image';
 import React from 'react';
 import Stripe from 'stripe';
@@ -61,7 +61,7 @@ export const query = graphql`
                 images
                 localFiles {
                     childImageSharp {
-                        fluid(maxWidth: 1000) {
+                        fluid {
                             ...GatsbyImageSharpFluid
                         }
                     }

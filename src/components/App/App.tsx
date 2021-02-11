@@ -1,18 +1,10 @@
 import './App.css';
-import React from 'react';
-import { useStripe } from '../../integrations/Stripe/stripeContext';
+import React, { useEffect, useState } from 'react';
+import { useStripe } from '../../contexts/Stripe/stripeContext';
 import Stripe from 'stripe';
-import {
-    Storage,
-    StorageKey,
-} from '../../integrations/localStorage/storage.service';
 import Img from 'gatsby-image';
 import { StripeProduct } from '../../types/stripe';
-
-type CartItem = {
-    ['price']: Stripe.Price;
-    ['quantity']: number;
-};
+import { CartItem, useCart } from '../../contexts/cart/cartContext';
 
 type Props = {
     pageContext: {
@@ -21,14 +13,10 @@ type Props = {
 };
 
 function App({ pageContext: { stripeProducts } }: Props) {
-    function getInitialCartItems(): CartItem[] {
-        return (Storage.get(StorageKey.CartItems)?.parse() ?? []) as CartItem[];
-    }
-
     const stripePromise = useStripe();
-    const [cartItems, setCartItems] = React.useState<CartItem[]>(
-        getInitialCartItems
-    );
+    const shoppingCart = useCart();
+
+    const [cartItems, setCartItems] = useState<CartItem[]>(shoppingCart.items);
 
     async function startCheckout() {
         function toLineItems(items: CartItem[]) {
@@ -57,34 +45,9 @@ function App({ pageContext: { stripeProducts } }: Props) {
         }
     }
 
-    function getCartItemByPrice(price: Stripe.Price): CartItem | undefined {
-        return cartItems.find(
-            (cartItem) => cartItem['price']['id'] === price['id']
-        );
-    }
-
-    function onQuantityChange(newQuantity: number, price: Stripe.Price) {
-        const newCartItems = cartItems.slice();
-        const prevCartItemIndex = cartItems.findIndex(
-            (cartItem) => cartItem['price']['id'] === price['id']
-        );
-
-        if (newQuantity > 0) {
-            const newCartItem: CartItem = {
-                ['price']: price,
-                ['quantity']: newQuantity,
-            };
-            if (prevCartItemIndex > -1) {
-                newCartItems[prevCartItemIndex] = newCartItem;
-            } else {
-                newCartItems.push(newCartItem);
-            }
-        } else if (prevCartItemIndex > -1) {
-            newCartItems.splice(prevCartItemIndex, 1);
-        }
-
-        Storage.set(StorageKey.CartItems, JSON.stringify(newCartItems));
-        setCartItems(newCartItems);
+    function onQuantityChange(price: Stripe.Price, value: number) {
+        shoppingCart.set(price, value);
+        setCartItems(shoppingCart.items);
     }
 
     return (
@@ -93,13 +56,12 @@ function App({ pageContext: { stripeProducts } }: Props) {
                 <div key={product.id}>
                     <p>id: {product.id}</p>
                     name: {product.name}
-                    <Img
-                        style={{ width: 600, height: 400 }}
-                        fluid={product.localFiles[0].childImageSharp.fluid}
-                    />
+                    <Img fluid={product.localFiles[0].childImageSharp.fluid} />
                     <div>
                         {product.prices.map((price) => {
-                            const cartItem = getCartItemByPrice(price);
+                            const cartItem = shoppingCart.getCartItemByPrice(
+                                price
+                            );
 
                             return (
                                 <div key={price.id}>
@@ -119,8 +81,8 @@ function App({ pageContext: { stripeProducts } }: Props) {
                                         }
                                         onChange={(event) =>
                                             onQuantityChange(
-                                                parseInt(event.target.value),
-                                                price
+                                                price,
+                                                parseInt(event.target.value)
                                             )
                                         }
                                     />

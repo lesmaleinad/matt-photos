@@ -1,6 +1,11 @@
 import React from 'react';
-import { StripeProvider } from './src/integrations/Stripe/stripeContext';
+import { rootContextProviders } from './src/contexts/contextFactory';
 
 export const wrapRootElement = ({ element }) => {
-    <StripeProvider>{element}</StripeProvider>;
+    return rootContextProviders.reduce(
+        (prevFn, currentFn) => {
+            return () => currentFn({ children: prevFn() });
+        },
+        () => element
+    )();
 };
