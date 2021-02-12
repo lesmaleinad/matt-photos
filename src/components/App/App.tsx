@@ -1,7 +1,6 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useStripe } from '../../contexts/Stripe/stripeContext';
-import Stripe from 'stripe';
 import Img from 'gatsby-image';
 import { StripeProduct } from '../../types/stripe';
 import { CartItem, useCart } from '../../contexts/cart/cartContext';
@@ -14,9 +13,7 @@ type Props = {
 
 function App({ pageContext: { stripeProducts } }: Props) {
     const stripePromise = useStripe();
-    const shoppingCart = useCart();
-
-    const [cartItems, setCartItems] = useState<CartItem[]>(shoppingCart.items);
+    const [shoppingCart, cartItems] = useCart();
 
     async function startCheckout() {
         function toLineItems(items: CartItem[]) {
@@ -43,11 +40,6 @@ function App({ pageContext: { stripeProducts } }: Props) {
         } else {
             console.error('stripe was never loaded!');
         }
-    }
-
-    function onQuantityChange(price: Stripe.Price, value: number) {
-        shoppingCart.set(price, value);
-        setCartItems(shoppingCart.items);
     }
 
     return (
@@ -80,7 +72,7 @@ function App({ pageContext: { stripeProducts } }: Props) {
                                             cartItem ? cartItem['quantity'] : 0
                                         }
                                         onChange={(event) =>
-                                            onQuantityChange(
+                                            shoppingCart.set(
                                                 price,
                                                 parseInt(event.target.value)
                                             )

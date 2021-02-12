@@ -1,5 +1,8 @@
 import { Stripe } from 'stripe';
-import provideContextToRoot from '../contextFactory';
+import {
+    provideStatefulContextToRoot,
+    StatefulRootContext,
+} from '../contextFactory';
 import { Storage, StorageKey } from '../localStorage/storage.service';
 
 export interface CartItem {
@@ -7,15 +10,24 @@ export interface CartItem {
     ['quantity']: number;
 }
 
-class ShoppingCart {
-    public items: CartItem[] = this.getInitialCartItems();
+class ShoppingCart extends StatefulRootContext<CartItem[]> {
+    public state: CartItem[] = this.getInitialCartItems();
+
+    public get items(): CartItem[] {
+        return this.state;
+    }
+
+    public set items(newItems: CartItem[]) {
+        this.updateStorage(newItems);
+        this.setState(newItems);
+    }
 
     private getInitialCartItems(): CartItem[] {
         return (Storage.get(StorageKey.CartItems)?.parse() ?? []) as CartItem[];
     }
 
-    private updateStorage() {
-        Storage.set(StorageKey.CartItems, JSON.stringify(this.items));
+    private updateStorage(items: CartItem[]) {
+        Storage.set(StorageKey.CartItems, JSON.stringify(items));
     }
 
     private getCartItemIndex(price: Stripe.Price): number {
@@ -42,13 +54,14 @@ class ShoppingCart {
                     ['quantity']: value,
                 });
             }
-        } else {
+        } else if (cartItemIndex !== -1) {
             itemsCopy.splice(cartItemIndex, 1);
         }
 
         this.items = itemsCopy;
-        this.updateStorage();
     }
 }
 
-export const useCart = provideContextToRoot(new ShoppingCart());
+export const useCart = provideStatefulContextToRoot<CartItem[], ShoppingCart>(
+    new ShoppingCart()
+);
