@@ -6,7 +6,12 @@ module.exports = {
         'gatsby-plugin-material-ui',
         'gatsby-plugin-layout',
         'gatsby-transformer-sharp',
-        'gatsby-plugin-sharp',
+        {
+            resolve: 'gatsby-plugin-sharp',
+            options: {
+                defaultQuality: 100,
+            },
+        },
         {
             resolve: `gatsby-source-stripe`,
             options: {

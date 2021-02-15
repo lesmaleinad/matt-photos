@@ -1,21 +1,11 @@
 import { graphql } from 'gatsby';
-import { FluidObject } from 'gatsby-image';
 import React from 'react';
-import Stripe from 'stripe';
 import App from '../components/App/App';
-import { StripeProduct } from '../types/stripe';
-
-export interface StripeProductNode extends Stripe.Product {
-    localFiles: {
-        childImageSharp: {
-            fluid: FluidObject;
-        };
-    }[];
-}
-
-interface StripePriceNode extends Stripe.Price {
-    product: StripeProductNode;
-}
+import {
+    StripePriceNode,
+    StripeProduct,
+    StripeProductNode,
+} from '../types/stripe';
 
 interface Props {
     data: {
@@ -61,8 +51,8 @@ export const query = graphql`
                 images
                 localFiles {
                     childImageSharp {
-                        fluid {
-                            ...GatsbyImageSharpFluid
+                        fixed {
+                            ...GatsbyImageSharpFixed
                         }
                     }
                 }

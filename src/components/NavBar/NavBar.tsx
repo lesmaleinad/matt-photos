@@ -14,12 +14,19 @@ interface Props {
 
 export default function NavBar({ location, tabs }: Props) {
     function getTabIndex(): number {
-        return tabs.findIndex((tab) => tab.to === location);
+        if (location.length === 1) {
+            return 0;
+        } else {
+            return (
+                tabs.slice(1).findIndex((tab) => location.includes(tab.to)) + 1
+            );
+        }
     }
 
     return (
         <Tabs
             value={getTabIndex()}
+            variant="scrollable"
             TabIndicatorProps={{ style: { background: 'black' } }}
         >
             {tabs.map((tab, index) => (

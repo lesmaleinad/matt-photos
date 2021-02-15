@@ -1,4 +1,3 @@
-import { AddBoxOutlined } from '@material-ui/icons';
 import React from 'react';
 
 export default function About() {

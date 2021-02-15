@@ -4,6 +4,7 @@ import { useStripe } from '../../contexts/Stripe/stripeContext';
 import Img from 'gatsby-image';
 import { StripeProduct } from '../../types/stripe';
 import { CartItem, useCart } from '../../contexts/cart/cartContext';
+import { Link } from 'gatsby';
 
 type Props = {
     pageContext: {
@@ -47,8 +48,15 @@ function App({ pageContext: { stripeProducts } }: Props) {
             {stripeProducts.map((product) => (
                 <div key={product.id}>
                     <p>id: {product.id}</p>
-                    name: {product.name}
-                    <Img fluid={product.localFiles[0].childImageSharp.fluid} />
+                    name:{' '}
+                    <Link
+                        to={`gallery/${product.name
+                            .toLowerCase()
+                            .replace(/ /g, '-')}/`}
+                    >
+                        {product.name}
+                    </Link>
+                    <Img fixed={product.localFiles[0].childImageSharp.fixed!} />
                     <div>
                         {product.prices.map((price) => {
                             const cartItem = shoppingCart.getCartItemByPrice(

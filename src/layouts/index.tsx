@@ -1,19 +1,27 @@
-import { Tabs, Tab } from '@material-ui/core';
-import { Link } from 'gatsby';
-import React, { useState } from 'react';
+import React from 'react';
 import NavBar, { NavBarTab } from '../components/NavBar/NavBar';
-import NavigationTab from '../components/NavBar/NavigationTab';
 
 interface Props {
     location: Location;
     children: JSX.Element;
 }
 
+const headerStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'space-between',
+};
+
+const nameStyle: React.CSSProperties = {};
+
 export default function Layout({ location, children }: Props) {
     const tabs: NavBarTab[] = [
         {
             to: '/',
             label: 'Home',
+        },
+        {
+            to: '/gallery/',
+            label: 'Gallery',
         },
         {
             to: '/about/',
@@ -27,7 +35,11 @@ export default function Layout({ location, children }: Props) {
 
     return (
         <div className="layout">
-            <NavBar location={location.pathname} tabs={tabs} />
+            <div style={headerStyle}>
+                <span style={nameStyle}>Matt Dahle</span>
+                <NavBar location={location.pathname} tabs={tabs} />
+            </div>
+
             {children}
         </div>
     );
