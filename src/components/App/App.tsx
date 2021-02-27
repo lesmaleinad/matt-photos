@@ -5,6 +5,7 @@ import Img from 'gatsby-image';
 import { StripeProduct } from '../../types/stripe';
 import { CartItem, useCart } from '../../contexts/cart/cartContext';
 import { Link } from 'gatsby';
+import { photoPageLink } from '../../utils/links';
 
 type Props = {
     pageContext: {
@@ -49,13 +50,7 @@ function App({ pageContext: { stripeProducts } }: Props) {
                 <div key={product.id}>
                     <p>id: {product.id}</p>
                     name:{' '}
-                    <Link
-                        to={`gallery/${product.name
-                            .toLowerCase()
-                            .replace(/ /g, '-')}/`}
-                    >
-                        {product.name}
-                    </Link>
+                    <Link to={photoPageLink(product)}>{product.name}</Link>
                     <Img fixed={product.localFiles[0].childImageSharp.fixed!} />
                     <div>
                         {product.prices.map((price) => {

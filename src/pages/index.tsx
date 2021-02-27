@@ -52,7 +52,7 @@ export const query = graphql`
                 localFiles {
                     childImageSharp {
                         fixed {
-                            ...GatsbyImageSharpFixed
+                            ...GatsbyImageSharpFixed_withWebp_tracedSVG
                         }
                     }
                 }
