@@ -50,8 +50,8 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                 <Link to={`../${photoPageLink(photos[index])}`}>
                     <Img
                         key={photos[index].id}
-                        fixed={
-                            photos[index].localFiles[0].childImageSharp.fixed!
+                        fluid={
+                            photos[index].localFiles[0].childImageSharp.fluid!
                         }
                     />
                 </Link>
@@ -68,8 +68,8 @@ export const query = graphql`
                 id
                 localFiles {
                     childImageSharp {
-                        fixed(width: 1200) {
-                            ...GatsbyImageSharpFixed_withWebp_tracedSVG
+                        fluid(maxWidth: 1200) {
+                            ...GatsbyImageSharpFluid_withWebp_tracedSVG
                         }
                     }
                 }

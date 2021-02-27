@@ -51,7 +51,10 @@ function App({ pageContext: { stripeProducts } }: Props) {
                     <p>id: {product.id}</p>
                     name:{' '}
                     <Link to={photoPageLink(product)}>{product.name}</Link>
-                    <Img fixed={product.localFiles[0].childImageSharp.fixed!} />
+                    <Img
+                        style={{ width: 400 }}
+                        fluid={product.localFiles[0].childImageSharp.fluid!}
+                    />
                     <div>
                         {product.prices.map((price) => {
                             const cartItem = shoppingCart.getCartItemByPrice(

@@ -1,11 +1,13 @@
-import { graphql } from 'gatsby';
+import { graphql, Link } from 'gatsby';
 import React from 'react';
+import Img from 'gatsby-image';
 import App from '../components/App/App';
 import {
     StripePriceNode,
     StripeProduct,
     StripeProductNode,
 } from '../types/stripe';
+import { photoPageLink } from '../utils/links';
 
 interface Props {
     data: {
@@ -28,7 +30,18 @@ export default function Index({ data }: Props) {
         );
         stripeProduct?.prices.push(stripePrice);
     });
-    return <App pageContext={{ stripeProducts }} />;
+    return (
+        <>
+            {stripeProducts.map((product) => (
+                <Link to={photoPageLink(product)} style={{ width: 400 }}>
+                    <Img
+                        style={{ width: 400 }}
+                        fluid={product.localFiles[0].childImageSharp.fluid!}
+                    />
+                </Link>
+            ))}{' '}
+        </>
+    );
 }
 
 export const query = graphql`
@@ -51,8 +64,8 @@ export const query = graphql`
                 images
                 localFiles {
                     childImageSharp {
-                        fixed {
-                            ...GatsbyImageSharpFixed_withWebp_tracedSVG
+                        fluid(maxWidth: 1200) {
+                            ...GatsbyImageSharpFluid_withWebp_tracedSVG
                         }
                     }
                 }
