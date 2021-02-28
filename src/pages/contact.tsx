@@ -1,8 +1,11 @@
+import { Button } from '@material-ui/core';
 import React from 'react';
+import { useCheckout } from '../contexts/checkout/checkoutContext';
 import { useDimmer } from '../contexts/dimmer/dimmerContext';
 
 export default function Contact() {
     const [dimmer] = useDimmer();
+    const [checkout] = useCheckout();
 
     function toggleDimmer() {
         dimmer.toggle();
@@ -11,7 +14,7 @@ export default function Contact() {
     return (
         <div>
             <h1>Contact</h1>
-            <button onClick={toggleDimmer}>Toggle Dimmer</button>
+            <Button onClick={toggleDimmer}>Toggle Dimmer</Button>
         </div>
     );
 }

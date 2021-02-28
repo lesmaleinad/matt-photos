@@ -1,12 +1,16 @@
 import { graphql } from 'gatsby';
-import React from 'react';
+import React, { useState } from 'react';
 import Img from 'gatsby-image';
-import { StripeProductNode } from '../../types/stripe';
+import { StripePriceNode, StripeProductNode } from '../../types/stripe';
 import { useCart } from '../../contexts/cart/cartContext';
+import { Button, MenuItem, Select } from '@material-ui/core';
+import Stripe from 'stripe';
+import { formattedPrice } from '../../utils/price';
 
 interface Props {
     data: {
         stripeProduct: StripeProductNode;
+        allStripePrice: { nodes: StripePriceNode[] };
     };
 }
 
@@ -14,8 +18,24 @@ const photoImgStyles: React.CSSProperties = {
     maxWidth: 1200,
 };
 
-export default function PhotoPage({ data: { stripeProduct } }: Props) {
-    const [shoppingCart, cartItems] = useCart();
+export default function PhotoPage({
+    data: { stripeProduct, allStripePrice },
+}: Props) {
+    const [shoppingCart] = useCart();
+    const [price, setPrice] = useState<string>(allStripePrice.nodes[0].id);
+
+    function handleNewPrice(event: React.ChangeEvent<{ value: unknown }>) {
+        setPrice(event.target.value as string);
+    }
+
+    function addToCart() {
+        const stripePrice = allStripePrice.nodes.find(
+            (stripePriceNode) => stripePriceNode.id === price
+        );
+        if (stripePrice) {
+            shoppingCart.add(stripePrice);
+        }
+    }
 
     return (
         <div>
@@ -25,6 +45,16 @@ export default function PhotoPage({ data: { stripeProduct } }: Props) {
                 style={photoImgStyles}
                 fluid={stripeProduct.localFiles[0].childImageSharp.fluid!}
             />
+            <div>
+                <Select value={price} onChange={handleNewPrice}>
+                    {allStripePrice.nodes.map((price) => (
+                        <MenuItem key={price.id} value={price.id}>
+                            {price.nickname}: {formattedPrice(price)}
+                        </MenuItem>
+                    ))}
+                </Select>
+                <Button onClick={addToCart}>Add to cart</Button>
+            </div>
         </div>
     );
 }
@@ -40,6 +70,13 @@ export const query = graphql`
                         ...GatsbyImageSharpFluid_withWebp_tracedSVG
                     }
                 }
+            }
+        }
+        allStripePrice(filter: { product: { id: { eq: $id } } }) {
+            nodes {
+                id
+                nickname
+                unit_amount
             }
         }
     }

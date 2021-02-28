@@ -33,9 +33,9 @@ export default function Index({ data }: Props) {
     return (
         <>
             {stripeProducts.map((product) => (
-                <Link to={photoPageLink(product)} style={{ width: 400 }}>
+                <Link key={product.id} to={photoPageLink(product)}>
                     <Img
-                        style={{ width: 400 }}
+                        style={{ maxWidth: '100%', width: 1000 }}
                         fluid={product.localFiles[0].childImageSharp.fluid!}
                     />
                 </Link>

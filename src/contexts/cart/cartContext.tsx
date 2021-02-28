@@ -1,3 +1,4 @@
+import { ThumbDownSharp } from '@material-ui/icons';
 import { Stripe } from 'stripe';
 import {
     provideStatefulContextToRoot,
@@ -26,6 +27,21 @@ class ShoppingCart extends StatefulRootContext<CartItem[]> {
         return (Storage.get(StorageKey.CartItems)?.parse() ?? []) as CartItem[];
     }
 
+    public getTotalItems(): number {
+        let total = 0;
+        this.items.forEach((item) => (total += item.quantity));
+        return total;
+    }
+
+    public getTotalPrice(): number {
+        let total = 0;
+        this.items.forEach(
+            (item) =>
+                (total += (item.price.unit_amount || 0 / 100) * item.quantity)
+        );
+        return total;
+    }
+
     private updateStorage(items: CartItem[]) {
         Storage.set(StorageKey.CartItems, JSON.stringify(items));
     }
@@ -38,6 +54,11 @@ class ShoppingCart extends StatefulRootContext<CartItem[]> {
 
     public getCartItemByPrice(price: Stripe.Price): CartItem | undefined {
         return this.items[this.getCartItemIndex(price)];
+    }
+
+    public add(price: Stripe.Price, amount: number = 1) {
+        const cartItem = this.getCartItemByPrice(price);
+        this.set(price, amount + (cartItem?.quantity || 0));
     }
 
     public set(price: Stripe.Price, value: number) {
