@@ -1,4 +1,4 @@
-import { Backdrop } from '@material-ui/core';
+import { Backdrop, Container } from '@material-ui/core';
 import { useStaticQuery, graphql } from 'gatsby';
 import React from 'react';
 import CheckoutDialog from '../components/Checkout/CheckoutDialog';
@@ -90,7 +90,7 @@ export default function Layout({ location, children }: Props) {
                 open={isDim}
                 onClick={dimmerOff}
             ></Backdrop>
-            {children}
+            <Container>{children}</Container>
         </div>
     );
 }

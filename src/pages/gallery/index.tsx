@@ -1,3 +1,10 @@
+import { Fade, Paper, Slide } from '@material-ui/core';
+import {
+    ArrowBackIosOutlined,
+    ArrowForwardIosOutlined,
+} from '@material-ui/icons';
+import SvgIcon from '@material-ui/icons/ArrowForwardIos';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import { graphql, Link } from 'gatsby';
 import Img from 'gatsby-image';
 import React, { useEffect } from 'react';
@@ -10,6 +17,15 @@ interface Props {
         allStripeProduct: { nodes: StripeProductNode[] };
     };
 }
+
+const arrowContainerStyles: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    position: 'absolute',
+    height: '100%',
+    width: '15%',
+    zIndex: 1,
+};
 
 export default function Gallery({ data: { allStripeProduct } }: Props) {
     const location = isBrowser ? window.location : null;
@@ -26,28 +42,24 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
     });
 
     function previousPhoto() {
-        if (location) {
+        if (location && index !== 0) {
             location.hash = photos[index - 1].name;
         }
     }
 
     function nextPhoto() {
-        if (location) {
+        if (location && index !== photos.length - 1) {
             location.hash = photos[index + 1].name;
         }
     }
 
     return (
-        <div>
-            <h1>Gallery</h1>
-            <button disabled={index === 0} onClick={previousPhoto}>
-                Prev
-            </button>
-            <button disabled={index === photos.length - 1} onClick={nextPhoto}>
-                Next
-            </button>
+        <div style={{ display: 'flex', position: 'relative' }}>
             {index !== -1 && (
-                <Link to={`../${photoPageLink(photos[index])}`}>
+                <Link
+                    style={{ flexGrow: 1 }}
+                    to={`../${photoPageLink(photos[index])}`}
+                >
                     <Img
                         key={photos[index].id}
                         fluid={
@@ -56,7 +68,57 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                     />
                 </Link>
             )}
+            <div style={arrowContainerStyles} onClick={previousPhoto}>
+                <Fade in={index !== 0} timeout={1000}>
+                    <Paper>
+                        <LeftArrow />
+                    </Paper>
+                </Fade>
+            </div>
+            <div
+                style={{
+                    ...arrowContainerStyles,
+                    right: 0,
+                    justifyContent: 'flex-end',
+                }}
+                onClick={nextPhoto}
+            >
+                <Fade in={index !== photos.length - 1} timeout={1000}>
+                    <Paper>
+                        <RightArrow />
+                    </Paper>
+                </Fade>
+            </div>
         </div>
+    );
+}
+
+const arrowStyles: React.CSSProperties = {
+    fontSize: 48,
+};
+
+function LeftArrow({ disabled }: { disabled?: boolean }) {
+    return (
+        <SvgIcon
+            style={{
+                ...arrowStyles,
+                opacity: disabled ? 0.2 : 0.6,
+            }}
+            component={ArrowBackIosOutlined}
+        ></SvgIcon>
+    );
+}
+
+function RightArrow({ disabled }: { disabled?: boolean }) {
+    return (
+        <SvgIcon
+            style={{
+                ...arrowStyles,
+                // opacity: index === photos.length - 1 ? 0.2 : 0.6,
+                opacity: disabled ? 0.2 : 0.6,
+            }}
+            component={ArrowForwardIosOutlined}
+        ></SvgIcon>
     );
 }
 

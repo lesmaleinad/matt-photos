@@ -7,8 +7,7 @@ import {
     Slide,
 } from '@material-ui/core';
 import { TransitionProps } from '@material-ui/core/transitions/transition';
-import { graphql, useStaticQuery } from 'gatsby';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Stripe from 'stripe';
 import Img from 'gatsby-image';
 import { useCart } from '../../contexts/cart/cartContext';
@@ -50,11 +49,16 @@ const Transition = React.forwardRef(function Transition(
 });
 
 export default function CheckoutDialog({ stripePrices }: Props) {
-    // const [stripePrices, setStripePrices] = useState<StripePriceNode[]>([]);
     const [shoppingCart, cartItems] = useCart();
     const [checkout, isCheckoutOpen] = useCheckout();
 
     const totalItems = shoppingCart.getTotalItems();
+
+    useEffect(() => {
+        if (totalItems === 0) {
+            closeDialog();
+        }
+    });
 
     function getProduct(
         stripePrice: Stripe.Price
@@ -98,27 +102,38 @@ export default function CheckoutDialog({ stripePrices }: Props) {
                         product && (
                             <div key={price.id.toString()}>
                                 <div style={{ display: 'flex' }}>
-                                    <Img
-                                        style={{ borderRadius: 4, width: 150 }}
-                                        fluid={
-                                            product.localFiles[0]
-                                                .childImageSharp.fluid!
-                                        }
-                                    />
+                                    <div style={{ flexShrink: 0 }}>
+                                        <Img
+                                            style={{
+                                                borderRadius: 4,
+                                            }}
+                                            fluid={
+                                                product.localFiles[0]
+                                                    .childImageSharp.fluid!
+                                            }
+                                        />
+                                        <div
+                                            style={{
+                                                width: '100%',
+                                                display: 'flex',
+                                            }}
+                                        >
+                                            <Button onClick={removeItem(price)}>
+                                                -
+                                            </Button>
+                                            <Button onClick={addItem(price)}>
+                                                +
+                                            </Button>
+                                        </div>
+                                    </div>
                                     <div>
                                         <div>Name: {product.name}</div>
                                         <div>Size: {price.nickname}</div>
                                         <div>
                                             Price: {formattedPrice(price)}
                                         </div>
+                                        <span>Quantity: {quantity}</span>
                                     </div>
-                                </div>
-                                <div style={{ display: 'flex' }}>
-                                    <span>Quantity: {quantity}</span>
-                                    <Button onClick={removeItem(price)}>
-                                        -
-                                    </Button>
-                                    <Button onClick={addItem(price)}>+</Button>
                                 </div>
                             </div>
                         )
