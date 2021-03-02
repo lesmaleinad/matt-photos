@@ -21,15 +21,20 @@ const photoImgStyles: React.CSSProperties = {
 export default function PhotoPage({
     data: { stripeProduct, allStripePrice },
 }: Props) {
+    const prices = allStripePrice.nodes.sort(byUnitAmount);
     const [shoppingCart] = useCart();
-    const [price, setPrice] = useState<string>(allStripePrice.nodes[0].id);
+    const [price, setPrice] = useState<string>(prices[0].id);
+
+    function byUnitAmount(a: Stripe.Price, b: Stripe.Price): number {
+        return (a.unit_amount ?? 0) - (b.unit_amount ?? 0);
+    }
 
     function handleNewPrice(event: React.ChangeEvent<{ value: unknown }>) {
         setPrice(event.target.value as string);
     }
 
     function addToCart() {
-        const stripePrice = allStripePrice.nodes.find(
+        const stripePrice = prices.find(
             (stripePriceNode) => stripePriceNode.id === price
         );
         if (stripePrice) {
@@ -47,7 +52,7 @@ export default function PhotoPage({
             />
             <div>
                 <Select value={price} onChange={handleNewPrice}>
-                    {allStripePrice.nodes.map((price) => (
+                    {prices.map((price) => (
                         <MenuItem key={price.id} value={price.id}>
                             {price.nickname}: {formattedPrice(price)}
                         </MenuItem>
