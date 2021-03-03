@@ -1,4 +1,4 @@
-import { Fade, Paper } from '@material-ui/core';
+import { Button, Fade } from '@material-ui/core';
 import {
     ArrowBackIosOutlined,
     ArrowForwardIosOutlined,
@@ -117,7 +117,7 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                     in={showArrows}
                     timeout={{ appear: 0, enter: 200, exit: 1000 }}
                 >
-                    <Paper
+                    <Button
                         style={{
                             ...arrowWrapperStyles,
                             background:
@@ -125,7 +125,7 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                         }}
                     >
                         <LeftArrow />
-                    </Paper>
+                    </Button>
                 </Fade>
             </div>
             <div
@@ -140,7 +140,7 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                     in={showArrows}
                     timeout={{ appear: 0, enter: 200, exit: 1000 }}
                 >
-                    <Paper
+                    <Button
                         style={{
                             ...arrowWrapperStyles,
                             background:
@@ -148,7 +148,7 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                         }}
                     >
                         <RightArrow />
-                    </Paper>
+                    </Button>
                 </Fade>
             </div>
         </div>
@@ -157,28 +157,19 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
 
 const arrowStyles: React.CSSProperties = {
     fontSize: 48,
+    opacity: 0.6,
 };
 
-function LeftArrow({ disabled }: { disabled?: boolean }) {
+function LeftArrow() {
     return (
-        <SvgIcon
-            style={{
-                ...arrowStyles,
-                opacity: disabled ? 0.2 : 0.6,
-            }}
-            component={ArrowBackIosOutlined}
-        ></SvgIcon>
+        <SvgIcon style={arrowStyles} component={ArrowBackIosOutlined}></SvgIcon>
     );
 }
 
-function RightArrow({ disabled }: { disabled?: boolean }) {
+function RightArrow() {
     return (
         <SvgIcon
-            style={{
-                ...arrowStyles,
-                // opacity: index === photos.length - 1 ? 0.2 : 0.6,
-                opacity: disabled ? 0.2 : 0.6,
-            }}
+            style={arrowStyles}
             component={ArrowForwardIosOutlined}
         ></SvgIcon>
     );

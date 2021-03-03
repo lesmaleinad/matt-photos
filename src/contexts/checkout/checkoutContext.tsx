@@ -21,12 +21,10 @@ class Checkout extends StatefulRootContext<boolean> {
     }
 
     public async startCheckout(items: CartItem[]) {
-        function lineItems() {
-            return items.map((item) => ({
-                price: item['price']['id'],
-                quantity: item['quantity'],
-            }));
-        }
+        const lineItems = items.map((item) => ({
+            price: item['price']['id'],
+            quantity: item['quantity'],
+        }));
 
         const stripe = await stripePromise;
 
@@ -35,7 +33,7 @@ class Checkout extends StatefulRootContext<boolean> {
                 mode: 'payment',
                 successUrl: window.location.href,
                 cancelUrl: window.location.href,
-                lineItems: lineItems(),
+                lineItems: lineItems,
                 shippingAddressCollection: { allowedCountries: ['US'] },
             });
 

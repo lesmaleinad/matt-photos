@@ -1,4 +1,3 @@
-import { ThumbDownSharp } from '@material-ui/icons';
 import { Stripe } from 'stripe';
 import {
     provideStatefulContextToRoot,

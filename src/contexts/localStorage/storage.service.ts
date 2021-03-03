@@ -10,13 +10,13 @@ export interface LocalStorageValue {
 export const isBrowser = typeof window !== 'undefined';
 
 export class Storage {
-    public static set(key: string, value: string) {
+    public static set(key: StorageKey, value: string) {
         if (isBrowser) {
             return window.localStorage.setItem(key, value);
         }
     }
 
-    public static get(key: string): LocalStorageValue | null {
+    public static get(key: StorageKey): LocalStorageValue | null {
         if (isBrowser) {
             const value = window.localStorage.getItem(key);
             if (value !== null) {
