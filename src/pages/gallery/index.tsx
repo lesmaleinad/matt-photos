@@ -7,6 +7,7 @@ import SvgIcon from '@material-ui/icons/ArrowForwardIos';
 import { graphql, Link } from 'gatsby';
 import Img from 'gatsby-image';
 import React, { useEffect, useRef, useState } from 'react';
+import { useDimmer } from '../../contexts/dimmer/dimmerContext';
 import { isBrowser } from '../../contexts/localStorage/storage.service';
 import { StripeProductNode } from '../../types/stripe';
 import { photoPageLink } from '../../utils/links';
@@ -41,6 +42,8 @@ const arrowWrapperStyles: React.CSSProperties = {
 export default function Gallery({ data: { allStripeProduct } }: Props) {
     const [showArrows, setShowArrows] = useState(true);
     const timeout = useRef<NodeJS.Timeout | undefined>();
+    const [dimmer] = useDimmer();
+
     const location = isBrowser ? window.location : null;
     const photos = allStripeProduct.nodes;
     const hash = location?.hash.slice(1);
@@ -48,6 +51,10 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
         ? photos.findIndex((photo) => photo.name === decodeURI(hash))
         : -1;
 
+    useEffect(() => {
+        dimmer.on();
+        return () => dimmer.off();
+    }, []);
     useEffect(() => {
         if (location && index === -1) {
             location.hash = photos[0].name;
@@ -78,7 +85,19 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
     }
 
     return (
-        <div style={{ display: 'flex', position: 'relative' }}>
+        <div
+            onMouseOver={() => setShowArrows(true)}
+            style={{
+                display: 'flex',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'calc(100% - 16px)',
+                maxWidth: 1200,
+                maxHeight: '80%',
+            }}
+        >
             {index !== -1 && (
                 <Link
                     style={{ flexGrow: 1 }}
@@ -89,6 +108,7 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                         fluid={
                             photos[index].localFiles[0].childImageSharp.fluid!
                         }
+                        style={{ height: '100%' }}
                     />
                 </Link>
             )}

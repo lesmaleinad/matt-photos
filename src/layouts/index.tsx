@@ -44,12 +44,14 @@ interface Props {
 const headerStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'space-between',
+    zIndex: 2,
+    backgroundColor: '#fafafa',
 };
 
 const nameStyle: React.CSSProperties = {};
 
 export default function Layout({ location, children }: Props) {
-    const [dimmer, isDim] = useDimmer();
+    const [_, isDim] = useDimmer();
     const stripePrices = getStripePrices();
     const tabs: NavBarTab[] = [
         {
@@ -70,10 +72,6 @@ export default function Layout({ location, children }: Props) {
         },
     ];
 
-    function dimmerOff() {
-        dimmer.off();
-    }
-
     return (
         <div className="layout">
             <div style={headerStyle}>
@@ -84,11 +82,11 @@ export default function Layout({ location, children }: Props) {
             <CheckoutEntry />
             <Backdrop
                 style={{
-                    zIndex: 1,
+                    zIndex: -1,
                     color: '#fff',
                 }}
                 open={isDim}
-                onClick={dimmerOff}
+                transitionDuration={500}
             ></Backdrop>
             <Container>{children}</Container>
         </div>
