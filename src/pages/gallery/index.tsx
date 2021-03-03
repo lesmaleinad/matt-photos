@@ -1,13 +1,12 @@
-import { Fade, Paper, Slide } from '@material-ui/core';
+import { Fade, Paper } from '@material-ui/core';
 import {
     ArrowBackIosOutlined,
     ArrowForwardIosOutlined,
 } from '@material-ui/icons';
 import SvgIcon from '@material-ui/icons/ArrowForwardIos';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import { graphql, Link } from 'gatsby';
 import Img from 'gatsby-image';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { isBrowser } from '../../contexts/localStorage/storage.service';
 import { StripeProductNode } from '../../types/stripe';
 import { photoPageLink } from '../../utils/links';
@@ -27,7 +26,21 @@ const arrowContainerStyles: React.CSSProperties = {
     zIndex: 1,
 };
 
+const arrowWrapperStyles: React.CSSProperties = {
+    border: 0,
+    borderRadius: 0,
+    boxShadow: '0 0 0 0 rgba(0, 0, 0, 0)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgb(0,0,0)',
+    height: '100%',
+    width: '100%',
+};
+
 export default function Gallery({ data: { allStripeProduct } }: Props) {
+    const [showArrows, setShowArrows] = useState(true);
+    const timeout = useRef<NodeJS.Timeout | undefined>();
     const location = isBrowser ? window.location : null;
     const photos = allStripeProduct.nodes;
     const hash = location?.hash.slice(1);
@@ -38,19 +51,30 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
     useEffect(() => {
         if (location && index === -1) {
             location.hash = photos[0].name;
+        } else if (showArrows) {
+            timeout.current && clearTimeout(timeout.current);
+            timeout.current = setTimeout(() => setShowArrows(false), 2000);
         }
     });
 
     function previousPhoto() {
-        if (location && index !== 0) {
-            location.hash = photos[index - 1].name;
+        if (location) {
+            location.hash =
+                index !== 0
+                    ? photos[index - 1].name
+                    : photos[photos.length - 1].name;
         }
+        setShowArrows(true);
     }
 
     function nextPhoto() {
-        if (location && index !== photos.length - 1) {
-            location.hash = photos[index + 1].name;
+        if (location) {
+            location.hash =
+                index !== photos.length - 1
+                    ? photos[index + 1].name
+                    : photos[0].name;
         }
+        setShowArrows(true);
     }
 
     return (
@@ -69,8 +93,17 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                 </Link>
             )}
             <div style={arrowContainerStyles} onClick={previousPhoto}>
-                <Fade in={index !== 0} timeout={1000}>
-                    <Paper>
+                <Fade
+                    in={showArrows}
+                    timeout={{ appear: 0, enter: 200, exit: 1000 }}
+                >
+                    <Paper
+                        style={{
+                            ...arrowWrapperStyles,
+                            background:
+                                'linear-gradient(90deg, rgba(255,255,255,0.7) 0%, rgba(0,0,0,0) 100%)',
+                        }}
+                    >
                         <LeftArrow />
                     </Paper>
                 </Fade>
@@ -83,8 +116,17 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                 }}
                 onClick={nextPhoto}
             >
-                <Fade in={index !== photos.length - 1} timeout={1000}>
-                    <Paper>
+                <Fade
+                    in={showArrows}
+                    timeout={{ appear: 0, enter: 200, exit: 1000 }}
+                >
+                    <Paper
+                        style={{
+                            ...arrowWrapperStyles,
+                            background:
+                                'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(255,255,255,0.7) 100%)',
+                        }}
+                    >
                         <RightArrow />
                     </Paper>
                 </Fade>
