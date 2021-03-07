@@ -72,9 +72,6 @@ export const query = graphql`
                         }
                     }
                 }
-                metadata {
-                    key
-                }
             }
         }
     }

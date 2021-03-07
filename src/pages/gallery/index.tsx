@@ -63,6 +63,17 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
             timeout.current = setTimeout(() => setShowArrows(false), 2000);
         }
     });
+    useEffect(() => {
+        function keyDown({ key }: KeyboardEvent) {
+            if (key === 'ArrowLeft' || key.toLowerCase() === 'a') {
+                previousPhoto();
+            } else if (key === 'ArrowRight' || key.toLowerCase() === 'd') {
+                nextPhoto();
+            }
+        }
+        window.addEventListener('keydown', keyDown);
+        return () => window.removeEventListener('keydown', keyDown);
+    });
 
     function previousPhoto() {
         if (location) {
@@ -85,93 +96,99 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
     }
 
     return (
-        <div
-            onMouseOver={() => setShowArrows(true)}
-            style={{
-                display: 'flex',
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 'calc(100% - 16px)',
-                maxWidth: 1200,
-                maxHeight: '80%',
-            }}
-        >
-            {index !== -1 && (
-                <Link
-                    style={{ flexGrow: 1 }}
-                    to={`../${photoPageLink(photos[index])}`}
-                >
-                    <Img
-                        key={photos[index].id}
-                        fluid={
-                            photos[index].localFiles[0].childImageSharp.fluid!
-                        }
-                        style={{ height: '100%' }}
-                    />
-                </Link>
-            )}
-            <div style={arrowContainerStyles} onClick={previousPhoto}>
-                <Fade
-                    in={showArrows}
-                    timeout={{ appear: 0, enter: 200, exit: 1000 }}
-                >
-                    <Button
-                        style={{
-                            ...arrowWrapperStyles,
-                            background:
-                                'linear-gradient(90deg, rgba(255,255,255,0.7) 0%, rgba(0,0,0,0) 100%)',
-                        }}
-                    >
-                        <LeftArrow />
-                    </Button>
-                </Fade>
-            </div>
+        <div className="wrapper" style={{ height: '100vh' }}>
             <div
+                onMouseOver={() => setShowArrows(true)}
                 style={{
-                    ...arrowContainerStyles,
-                    right: 0,
-                    justifyContent: 'flex-end',
+                    display: 'flex',
+                    position: 'relative',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    maxWidth: 1200,
+                    maxHeight: '80%',
                 }}
-                onClick={nextPhoto}
             >
-                <Fade
-                    in={showArrows}
-                    timeout={{ appear: 0, enter: 200, exit: 1000 }}
-                >
-                    <Button
-                        style={{
-                            ...arrowWrapperStyles,
-                            background:
-                                'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(255,255,255,0.7) 100%)',
-                        }}
+                {index !== -1 && (
+                    <Link
+                        style={{ flexGrow: 1 }}
+                        to={`../${photoPageLink(photos[index])}`}
                     >
-                        <RightArrow />
-                    </Button>
-                </Fade>
+                        <Img
+                            key={photos[index].id}
+                            fluid={
+                                photos[index].localFiles[0].childImageSharp
+                                    .fluid!
+                            }
+                            imgStyle={{ width: 'auto', height: 'auto' }}
+                            style={{ height: '100%' }}
+                        />
+                    </Link>
+                )}
+                <div style={arrowContainerStyles} onClick={previousPhoto}>
+                    <LeftArrow showArrow={showArrows} />
+                </div>
+                <div
+                    style={{
+                        ...arrowContainerStyles,
+                        right: 0,
+                        justifyContent: 'flex-end',
+                    }}
+                    onClick={nextPhoto}
+                >
+                    <RightArrow showArrow={showArrows} />
+                </div>
             </div>
         </div>
     );
 }
+
+interface ArrowProps {
+    showArrow: boolean;
+}
+
+const arrowTimeout = { appear: 0, enter: 200, exit: 1000 };
 
 const arrowStyles: React.CSSProperties = {
     fontSize: 48,
     opacity: 0.6,
 };
 
-function LeftArrow() {
+function LeftArrow({ showArrow }: ArrowProps) {
     return (
-        <SvgIcon style={arrowStyles} component={ArrowBackIosOutlined}></SvgIcon>
+        <Fade in={showArrow} timeout={arrowTimeout}>
+            <Button
+                style={{
+                    ...arrowWrapperStyles,
+                    background:
+                        'linear-gradient(90deg, rgba(255,255,255,0.7) 0%, rgba(0,0,0,0) 100%)',
+                }}
+            >
+                <SvgIcon
+                    style={arrowStyles}
+                    component={ArrowBackIosOutlined}
+                ></SvgIcon>
+            </Button>
+        </Fade>
     );
 }
 
-function RightArrow() {
+function RightArrow({ showArrow }: ArrowProps) {
     return (
-        <SvgIcon
-            style={arrowStyles}
-            component={ArrowForwardIosOutlined}
-        ></SvgIcon>
+        <Fade in={showArrow} timeout={arrowTimeout}>
+            <Button
+                style={{
+                    ...arrowWrapperStyles,
+                    background:
+                        'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(255,255,255,0.7) 100%)',
+                }}
+            >
+                <SvgIcon
+                    style={arrowStyles}
+                    component={ArrowForwardIosOutlined}
+                ></SvgIcon>
+            </Button>
+        </Fade>
     );
 }
 

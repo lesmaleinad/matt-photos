@@ -1,20 +1,27 @@
-import { Backdrop, Container } from '@material-ui/core';
+import { Backdrop, Container, useMediaQuery } from '@material-ui/core';
 import { useStaticQuery, graphql } from 'gatsby';
-import React from 'react';
+import Img, { FluidObject } from 'gatsby-image';
+import React, { useEffect, useRef, useState } from 'react';
 import CheckoutDialog from '../components/Checkout/CheckoutDialog';
 import CheckoutEntry from '../components/Checkout/CheckoutEntry';
 import NavBar, { NavBarTab } from '../components/NavBar/NavBar';
 import { useDimmer } from '../contexts/dimmer/dimmerContext';
 import { StripePriceNode } from '../types/stripe';
+import { useSizes } from '../utils/mediaQueries';
 
 interface QueryData {
     allStripePrice: {
         nodes: StripePriceNode[];
     };
+    file: {
+        childImageSharp: {
+            fluid: FluidObject;
+        };
+    };
 }
 
-const getStripePrices = () => {
-    const { allStripePrice }: QueryData = useStaticQuery(graphql`
+const getData = () => {
+    const { allStripePrice, file }: QueryData = useStaticQuery(graphql`
         query {
             allStripePrice {
                 nodes {
@@ -31,9 +38,16 @@ const getStripePrices = () => {
                     }
                 }
             }
+            file(relativePath: { eq: "signature.png" }) {
+                childImageSharp {
+                    fluid {
+                        ...GatsbyImageSharpFluid_withWebp_tracedSVG
+                    }
+                }
+            }
         }
     `);
-    return allStripePrice.nodes;
+    return { stripePrices: allStripePrice.nodes, logo: file.childImageSharp };
 };
 
 interface Props {
@@ -42,17 +56,24 @@ interface Props {
 }
 
 const headerStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'space-between',
+    position: 'fixed',
+    minHeight: '100vh',
     zIndex: 2,
     backgroundColor: '#fafafa',
 };
 
-const nameStyle: React.CSSProperties = {};
+const mainStyles: React.CSSProperties = {
+    display: 'flex',
+};
 
 export default function Layout({ location, children }: Props) {
+    const header = useRef<HTMLDivElement | null>(null);
+    const [headWidth, setHeaderWidth] = useState<number>(0);
     const [_, isDim] = useDimmer();
-    const stripePrices = getStripePrices();
+    const { stripePrices, logo } = getData();
+    useEffect(() => {
+        setHeaderWidth(header.current?.offsetWidth || 0);
+    }, [header.current?.offsetWidth]);
     const tabs: NavBarTab[] = [
         {
             to: '/',
@@ -74,21 +95,38 @@ export default function Layout({ location, children }: Props) {
 
     return (
         <div className="layout">
-            <div style={headerStyle}>
-                <span style={nameStyle}>Matt Dahle</span>
-                <NavBar location={location.pathname} tabs={tabs} />
+            <div className="main" style={mainStyles}>
+                <div ref={header} style={headerStyle}>
+                    <div style={{ padding: 8 }} className="logo">
+                        <Img fluid={logo.fluid} />
+                    </div>
+
+                    <NavBar location={location.pathname} tabs={tabs} />
+                </div>
+
+                <div
+                    className="content"
+                    style={{
+                        paddingLeft: header.current?.offsetWidth,
+                        width: '100%',
+                    }}
+                >
+                    <Container>
+                        <Backdrop
+                            style={{
+                                zIndex: -1,
+                                color: '#fff',
+                            }}
+                            open={isDim}
+                            transitionDuration={500}
+                        ></Backdrop>
+                        {children}
+                    </Container>
+                </div>
             </div>
+
             <CheckoutDialog stripePrices={stripePrices} />
             <CheckoutEntry />
-            <Backdrop
-                style={{
-                    zIndex: -1,
-                    color: '#fff',
-                }}
-                open={isDim}
-                transitionDuration={500}
-            ></Backdrop>
-            <Container>{children}</Container>
         </div>
     );
 }

@@ -7,6 +7,13 @@ module.exports = {
         'gatsby-plugin-layout',
         'gatsby-transformer-sharp',
         {
+            resolve: `gatsby-source-filesystem`,
+            options: {
+                name: `src`,
+                path: `${__dirname}/src/`,
+            },
+        },
+        {
             resolve: 'gatsby-plugin-sharp',
             options: {
                 defaultQuality: 100,

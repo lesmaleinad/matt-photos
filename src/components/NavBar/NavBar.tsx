@@ -25,8 +25,9 @@ export default function NavBar({ location, tabs }: Props) {
 
     return (
         <Tabs
-            value={getTabIndex()}
+            orientation="vertical"
             variant="scrollable"
+            value={getTabIndex()}
             TabIndicatorProps={{ style: { background: 'black' } }}
         >
             {tabs.map((tab, index) => (
