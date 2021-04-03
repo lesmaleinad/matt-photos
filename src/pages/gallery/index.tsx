@@ -18,13 +18,19 @@ interface Props {
     };
 }
 
+class CustomImg extends Img {
+    public imageRef?: {
+        current: HTMLImageElement;
+    };
+}
+
 const arrowContainerStyles: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     position: 'absolute',
     height: '100%',
     width: '15%',
-    zIndex: 1,
+    zIndex: 2,
 };
 
 const arrowWrapperStyles: React.CSSProperties = {
@@ -41,8 +47,10 @@ const arrowWrapperStyles: React.CSSProperties = {
 
 export default function Gallery({ data: { allStripeProduct } }: Props) {
     const [showArrows, setShowArrows] = useState(true);
-    const timeout = useRef<NodeJS.Timeout | undefined>();
     const [dimmer] = useDimmer();
+    const timeout = useRef<NodeJS.Timeout | undefined>();
+    const imageRef = useRef<CustomImg | null>(null);
+    const [imageSize, setImageSize] = useState(getImageSize());
 
     const location = isBrowser ? window.location : null;
     const photos = allStripeProduct.nodes;
@@ -51,18 +59,22 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
         ? photos.findIndex((photo) => photo.name === decodeURI(hash))
         : -1;
 
+    // Dim the page on mount
     useEffect(() => {
         dimmer.on();
         return () => dimmer.off();
     }, []);
+
     useEffect(() => {
         if (location && index === -1) {
             location.hash = photos[0].name;
-        } else if (showArrows) {
-            timeout.current && clearTimeout(timeout.current);
-            timeout.current = setTimeout(() => setShowArrows(false), 2000);
+        } else if (showArrows && !timeout.current) {
+            resetArrowFadeoutTimer();
         }
     });
+
+    useEffect(() => setImageSize(getImageSize()));
+
     useEffect(() => {
         function keyDown({ key }: KeyboardEvent) {
             if (key === 'ArrowLeft' || key.toLowerCase() === 'a') {
@@ -75,6 +87,12 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
         return () => window.removeEventListener('keydown', keyDown);
     });
 
+    function resetArrowFadeoutTimer() {
+        timeout.current && clearTimeout(timeout.current);
+        timeout.current = setTimeout(() => setShowArrows(false), 2000);
+        setShowArrows(true);
+    }
+
     function previousPhoto() {
         if (location) {
             location.hash =
@@ -82,7 +100,7 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                     ? photos[index - 1].name
                     : photos[photos.length - 1].name;
         }
-        setShowArrows(true);
+        resetArrowFadeoutTimer();
     }
 
     function nextPhoto() {
@@ -92,53 +110,85 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                     ? photos[index + 1].name
                     : photos[0].name;
         }
-        setShowArrows(true);
+        resetArrowFadeoutTimer();
+    }
+
+    function getImageSize() {
+        return {
+            width: imageRef.current?.imageRef?.current.width || 0,
+            height: imageRef.current?.imageRef?.current.height || 0,
+        };
     }
 
     return (
-        <div className="wrapper" style={{ height: '100vh' }}>
-            <div
-                onMouseOver={() => setShowArrows(true)}
-                style={{
-                    display: 'flex',
-                    position: 'relative',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    maxWidth: 1200,
-                    maxHeight: '80%',
-                }}
-            >
-                {index !== -1 && (
-                    <Link
-                        style={{ flexGrow: 1 }}
-                        to={`../${photoPageLink(photos[index])}`}
-                    >
-                        <Img
-                            key={photos[index].id}
-                            fluid={
-                                photos[index].localFiles[0].childImageSharp
-                                    .fluid!
-                            }
-                            imgStyle={{ width: 'auto', height: 'auto' }}
-                            style={{ height: '100%' }}
-                        />
-                    </Link>
-                )}
-                <div style={arrowContainerStyles} onClick={previousPhoto}>
-                    <LeftArrow showArrow={showArrows} />
-                </div>
-                <div
-                    style={{
-                        ...arrowContainerStyles,
-                        right: 0,
-                        justifyContent: 'flex-end',
-                    }}
-                    onClick={nextPhoto}
+        <div
+            className="wrapper"
+            style={{
+                padding: `16px 0`,
+            }}
+        >
+            {index !== -1 && (
+                <Link
+                    style={{ position: 'relative', zIndex: 1 }}
+                    to={`../${photoPageLink(photos[index])}`}
                 >
-                    <RightArrow showArrow={showArrows} />
-                </div>
-            </div>
+                    <Img
+                        ref={imageRef}
+                        onStartLoad={() => setImageSize(getImageSize())}
+                        onLoad={() => setImageSize(getImageSize())}
+                        key={photos[index].id}
+                        fluid={
+                            photos[index].localFiles[0].childImageSharp.fluid!
+                        }
+                        style={{
+                            maxHeight: 'calc(100vh - 32px)',
+                            objectFit: 'contain',
+                            width: 'auto',
+                        }}
+                        imgStyle={{
+                            objectFit: 'contain',
+                            width: 'auto',
+                        }}
+                    ></Img>
+                    <div
+                        className="arrows"
+                        onMouseOver={resetArrowFadeoutTimer}
+                        style={{
+                            opacity: !imageSize?.width ? 0 : 1,
+                            position: 'absolute',
+                            top: 0,
+                            height: imageSize?.height,
+                            width: imageSize?.width,
+                            zIndex: 0,
+                        }}
+                    >
+                        <div
+                            style={arrowContainerStyles}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.nativeEvent.stopImmediatePropagation();
+                                previousPhoto();
+                            }}
+                        >
+                            <LeftArrow showArrow={showArrows} />
+                        </div>
+                        <div
+                            style={{
+                                ...arrowContainerStyles,
+                                right: 0,
+                                justifyContent: 'flex-end',
+                            }}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.nativeEvent.stopImmediatePropagation();
+                                previousPhoto();
+                            }}
+                        >
+                            <RightArrow showArrow={showArrows} />
+                        </div>
+                    </div>
+                </Link>
+            )}
         </div>
     );
 }

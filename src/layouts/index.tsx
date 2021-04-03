@@ -67,13 +67,14 @@ const mainStyles: React.CSSProperties = {
 };
 
 export default function Layout({ location, children }: Props) {
+    const { isSmall } = useSizes();
     const header = useRef<HTMLDivElement | null>(null);
-    const [headWidth, setHeaderWidth] = useState<number>(0);
+    const [headerWidth, setHeaderWidth] = useState<number>(0);
     const [_, isDim] = useDimmer();
     const { stripePrices, logo } = getData();
     useEffect(() => {
         setHeaderWidth(header.current?.offsetWidth || 0);
-    }, [header.current?.offsetWidth]);
+    }, [header.current?.offsetWidth, isSmall]);
     const tabs: NavBarTab[] = [
         {
             to: '/',
@@ -107,7 +108,7 @@ export default function Layout({ location, children }: Props) {
                 <div
                     className="content"
                     style={{
-                        paddingLeft: header.current?.offsetWidth,
+                        paddingLeft: headerWidth,
                         width: '100%',
                     }}
                 >
