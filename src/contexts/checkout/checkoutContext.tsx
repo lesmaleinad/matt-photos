@@ -5,7 +5,7 @@ import {
     StatefulRootContext,
 } from '../contextFactory';
 
-const stripePromise = loadStripe(process.env.STRIPE_API_PUBLIC || '');
+const stripePromise = loadStripe(process.env.GATSBY_STRIPE_API_PUBLIC || '');
 
 class Checkout extends StatefulRootContext<boolean> {
     public state: boolean = false;
