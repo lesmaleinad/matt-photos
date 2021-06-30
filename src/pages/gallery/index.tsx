@@ -181,7 +181,7 @@ export default function Gallery({ data: { allStripeProduct } }: Props) {
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.nativeEvent.stopImmediatePropagation();
-                                previousPhoto();
+                                nextPhoto();
                             }}
                         >
                             <RightArrow showArrow={showArrows} />
